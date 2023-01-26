@@ -13,20 +13,21 @@ namespace DependencyInjection_Demo
             //Add NuGET Packages: Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Hosting
 
             //this method of dependency injection is not to be used in classes! The configuration and calling of services should be in one place --> do not use the service locator pattern
-            //use the Host-Interface to configure services with dependency injection
-            //the CreateDefaultbuilder does a lot of stuff, e.g. configuring logging, configuration, etc. (Look at the Class Description!)
+            //use the Host-Interface to configure services for dependency injection
+            //the CreateDefaultbuilder does a lot of stuff, e.g. configuring logging, configure lifetime for services, etc. --> look at the class description!
             //the host is also the dependency injection container, which manages and remembers all the services and their implementation
             IHost _host = Host.CreateDefaultBuilder().ConfigureServices(services => 
             {
-                //Configure Services here
-                //the application service is configured with a lifetime/scope (there are singleton, transient and scoped lifetimes for services)
-                //the container now knows that it should intantiate the IApplication Interface with the Application-Implementetion when called upon
-                // --> for DBContext: the AddDbContext-Method already has the DbContext-Interface i´n it, it just needs the implementation iT's supposed to use when the DbContext is called
+                //register services here
+                //most services are configured with a lifetime/scope (there are singleton, transient and scoped lifetimes for services)
+                //the container now knows that it should intantiate the IDemoService interface with an instance of DemoService when called
+                /*non-custom classes like DbContext and Loggers can be added and configured by creating a ServiceCollection and use separate "addX"-methods, 
+                 * that already contain all necessary interfaces, to add services to the collection*/
                 services.AddSingleton<IDemoService, DemoService>();
             })
                 .Build();
 
-            //call the dependency by telling the DI-container to instantiate the called-for service
+            //call the dependency by calling the service from the container
             var demo = _host.Services.GetRequiredService<IDemoService>();
             demo.doSomething();
 
